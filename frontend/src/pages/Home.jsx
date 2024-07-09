@@ -17,8 +17,8 @@ const Home = () => {
                   SMA Bina Insan Mandiri Bogor
                 </span>
               </div>
-              <div className="text sm:mb-16 mb-4">
-                <p className="text-base text-gray-600 leading-7 max-w-5xl md:mx-auto mx-5">
+              <div className="sm:mb-16 mb-4">
+                <p className="text-xs sm:text-base text-gray-600 leading-7 max-w-5xl md:mx-auto mx-5">
                   Sistem Pendukung Keputusan (SPK) yang ada di website ini
                   bertujuan untuk menentukan santri terbaik di SMA Bina Insan
                   Mandiri Bogor, dengan menggunakan berbagai kriteria penilaian

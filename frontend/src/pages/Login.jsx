@@ -1,28 +1,43 @@
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import logo from "../assets/img/LOGO2.png";
-import { useEffect, useState } from "react";
-
+import { useState } from "react";
+import { LuAlertTriangle, LuChevronLeft } from "react-icons/lu";
 const LoginCover = () => {
+
   const [auth, setAuth] = useState({
     email: null,
-    password: null
-  })
+    password: null,
+  });
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  const [errors, setErrors] = useState({ email: "", password: "", general: "" });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setAuth(prevState => ({
+    setAuth((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
+    setErrors({
+      ...errors,
+      [name]: "",
+      general: "",
+    });
   };
 
   const submitForm = async () => {
+    event.preventDefault();
+
     if (!auth.email || !auth.password) {
-      console.error("required");
-      return
+      setErrors({
+        email: !auth.email ? "Email diperlukan" : "",
+        password: !auth.password ? "Password diperlukan" : "",
+        general: "Mohon isi semua field",
+      });
+      return;
     }
+
     try {
       const { email, password } = auth;
       const response = await fetch(`${process.env.API_URL}/auth/login`, {
@@ -33,25 +48,24 @@ const LoginCover = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      // const json = await response.json();
+      const responData = await response.json();
 
       if (!response.ok) {
-        throw new Error("Gagal melakukan permintaan.");
+        setErrors({
+          email: "",
+          password: "",
+          general: responData.message || "Login gagal",
+        });
+        return;
       }
 
-      
-      const {data} = await response.json();
+      const { data } = responData;
 
-      console.log(data.access_token)
-
-      if(response.ok) {
-        localStorage.setItem("user", JSON.stringify(data.access_token));
-        navigate('/admin/dashboard')
+      if (response.ok) {
+        localStorage.setItem("user", data.access_token);
+        localStorage.setItem("role", data.data.role);
+        navigate("/admin/dashboard");
       }
-
-
-      console.log(data.access_token);
-  
     } catch (error) {
       console.error("Terjadi kesalahan:", error.message);
     }
@@ -75,7 +89,7 @@ const LoginCover = () => {
           <p className="mb-7 text-base">
             Masukan email dan password untuk masuk ke Dashboard SPK
           </p>
-          <div className="space-y-5" >
+          <form className="space-y-5" onSubmit={submitForm}>
             <div>
               <label htmlFor="email" className="">
                 Email
@@ -86,7 +100,7 @@ const LoginCover = () => {
                 type="email"
                 className="form-input"
                 placeholder="Masukan Email"
-                onChange={handleChange} 
+                onChange={handleChange}
               />
             </div>
             <div>
@@ -97,14 +111,27 @@ const LoginCover = () => {
                 name="password"
                 className="form-input"
                 placeholder="Masukan Password"
-                onChange={handleChange} 
+                onChange={handleChange}
               />
             </div>
-            <button type="button" onClick={submitForm} className="btn btn-success w-full">
+            <button type="submit" className="btn btn-success w-full">
               Masuk
             </button>
-            {/* {error && <div className="error">{error}</div>} */}
-          </div>
+            {errors.general && (
+              <p className="p-3.5 rounded-md text-sm text-danger bg-danger-light flex items-center justify-between">{errors.general}
+              <LuAlertTriangle size={20} />
+              </p>
+            )}
+            <div
+              className="text-success relative text-sm group cursor-pointer w-full"
+              onClick={() => navigate("/")}
+            >
+              <p className="relative inline-block">
+                Kembali ke halaman utama
+                <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-current transition-all duration-600 group-hover:w-full"></span>
+              </p>
+            </div>
+          </form>
         </div>
       </div>
     </div>

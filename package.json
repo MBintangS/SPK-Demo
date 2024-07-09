@@ -13,6 +13,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "concurrently": "^8.2.2"
+    "@tippyjs/react": "^4.2.6",
+    "concurrently": "^8.2.2",
+    "fastest-validator": "^1.18.0"
   }
 }

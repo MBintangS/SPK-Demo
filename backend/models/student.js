@@ -1,22 +1,16 @@
 const mongoose = require('mongoose')
-
 const Schema = mongoose.Schema
 
 const Fields = new Schema({
-    email: {
+    nisn: {
         type: String,
         required: true
     },
-    password: {
-        type: String,
-        required: true
-    },
-    roles: {
+    name: {
         type: String,
         required: true
     },
 }, { timestamps: false })
 
-const Model = mongoose.model('Users', Fields)
-
+const Model = mongoose.model('Students', Fields)
 module.exports = Model

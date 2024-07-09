@@ -1,17 +1,18 @@
-
-
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const {User} = require('../../models')
 
 module.exports = async (req, res) => {
-    const {email, password} = req.body    
+    const {email, password, roles} = req.body    
 
     if (!email || !password) {
         throw Error('All field must be filled')
     }
 
     const user = await User.findOne({ email })
+
+    const dataUser = await User.findOne({email})
+
     if (!user) {
         return res.json(404, {
             status: false,
@@ -34,10 +35,9 @@ module.exports = async (req, res) => {
     return res.json(200, {
         status: true,
         data: {
-            access_token: token
+            access_token: token,
+            data: dataUser
         }
     });
-    
-    // const data = await Users.find({}).select('email').sort({createdAt: -1})
-  
+
 }

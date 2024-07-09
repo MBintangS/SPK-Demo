@@ -4,12 +4,14 @@ import { createContext, useContext, useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import {useNavigate} from "react-router-dom"
-
 const SidebarContext = createContext();
+
 
 export default function Sidebar({ children }) {
   const mySwal = withReactContent(Swal);
   const navigate = useNavigate()
+
+  const role = localStorage.getItem('role')
 
   const swal = () => {
     mySwal.fire({
@@ -23,7 +25,9 @@ export default function Sidebar({ children }) {
       cancelButtonText: "Kembali"
     }).then((result) => {
       if (result.isConfirmed) {
-        navigate("/")
+        localStorage.removeItem("user");
+        localStorage.removeItem("role");
+        navigate("/auth/login")
       }
     });
   };
@@ -67,7 +71,7 @@ export default function Sidebar({ children }) {
               } `}
             >
               <div className="leading-4 ps-1">
-                <p className="font-medium text-base">Admin</p>
+                <p className="font-medium text-base">{role}</p>
                 {/* <span className="text-xs text-gray-600">
                   constgenius@gmail.com
                 </span> */}

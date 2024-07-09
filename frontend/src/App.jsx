@@ -13,8 +13,17 @@ import {
   DataSubKriteria,
   KelolaAdmin
 } from "./pages/admin";
+import PrivateRoute from "./context/Private";
 
-  
+const adminRoutes = [
+  { path: "/admin/dashboard", element: <Dashboard />, roles: ['Admin', 'Ustadz', 'Managerial', 'User'] },
+  { path: "/admin/data-kriteria", element: <DataKriteria />, roles: ['Admin', 'Managerial'] },
+  { path: "/admin/data-sub-kriteria", element: <DataSubKriteria />, roles: ['Admin', 'Managerial'] },
+  { path: "/admin/data-alternatif", element: <DataAlternatif />, roles: ['Admin', 'Managerial'] },
+  { path: "/admin/data-penilaian", element: <DataPenilaian />, roles: ['Admin', 'Ustadz'] },
+  { path: "/admin/data-perhitungan", element: <DataPerhitungan />, roles: ['Admin', 'Ustadz'] },
+  { path: "/admin/data-hasil-akhir", element: <DataHasilAkhir />, roles: ['Admin', 'Ustadz', 'Managerial', 'User'] },
+];
 
 function App() {
 
@@ -39,70 +48,20 @@ function App() {
             </>
           }
         />
-        <Route
-          path="/admin/dashboard"
-          element={
-            <>
-              <Dashboard />
-            </>
-          }
-        />
-        <Route
-          path="/admin/data-kriteria"
-          element={
-            <>
-              <DataKriteria />
-            </>
-          }
-        />
-        <Route
-          path="/admin/data-sub-kriteria"
-          element={
-            <>
-              <DataSubKriteria />
-            </>
-          }
-        />
-        <Route
-          path="/admin/data-alternatif"
-          element={
-            <>
-              <DataAlternatif />
-            </>
-          }
-        />
-        <Route
-          path="/admin/data-penilaian"
-          element={
-            <>
-              <DataPenilaian />
-            </>
-          }
-        />
-        <Route
-          path="/admin/data-perhitungan"
-          element={
-            <>
-              <DataPerhitungan />
-            </>
-          }
-        />
-        <Route
-          path="/admin/data-Hasil-akhir"
-          element={
-            <>
-              <DataHasilAkhir />
-            </>
-          }
-        />
-        <Route
-          path="/admin/kelola-admin"
-          element={
-            <>
-              <KelolaAdmin />
-            </>
-          }
-        />
+
+        {/* Admin Pages */}
+        {adminRoutes.map(({ path, element, roles }) => (
+          <Route
+            key={path}
+            path={path}
+            element={
+              <PrivateRoute roles={roles}>
+                {element}
+              </PrivateRoute>
+            }
+          />
+        ))}
+        
       </Routes>
     </>
   );
