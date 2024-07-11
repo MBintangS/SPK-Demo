@@ -1,5 +1,4 @@
-
-const {Kriteria} = require('../../models')
+const { Kriteria } = require('../../models');
 const fastestValidator = require('fastest-validator');
 const validator = new fastestValidator();
 
@@ -8,7 +7,7 @@ module.exports = async (req, res) => {
         bobot: 'number|empty:false',
         type: 'string|empty:false',
         name: 'string|empty:false',
-    }
+    };
     const validate = validator.validate(req.body, schemaValidation);
 
     if (validate.length) {
@@ -21,32 +20,36 @@ module.exports = async (req, res) => {
     let normalizedBobot = 0;
     let latestKode = 0;
 
-    await Kriteria.find({}).select('bobot').then((data) => {
-        let totalBobot = req.body.bobot;
-        data.map((item) => {
-            totalBobot += item.bobot
-        })
-        normalizedBobot = req.body.bobot / totalBobot
-        data.map(async (item, index) => {
-            latestKode = index
+    const allKriteria = await Kriteria.find({}).select('bobot kode');
+
+    let totalBobot = req.body.bobot;
+    allKriteria.forEach((item) => {
+        totalBobot += item.bobot;
+    });
+
+    normalizedBobot = req.body.bobot / totalBobot;
+
+    await Promise.all(
+        allKriteria.map(async (item) => {
             const currentNormalizedBobot = item.bobot / totalBobot;
             await item.updateOne({
-                normalizedBobot: currentNormalizedBobot,
-                kode: index + 1
-            }).catch(({message}) => {
+                normalizedBobot: currentNormalizedBobot
+            }).catch(({ message }) => {
                 return res.status(500).json({
                     status: 'error',
-                    message: 'Santri gagal diupdate',
+                    message: 'Kriteria gagal diupdate',
                     error: message
                 });
-            })
-            totalBobot += item.bobot
-
+            });
         })
-    })
-    
+    );
+
+    if (allKriteria.length > 0) {
+        latestKode = Math.max(...allKriteria.map(k => k.kode));
+    }
+
     const created = await Kriteria.create({
-        kode: latestKode + 2,
+        kode: latestKode + 1,
         name: req.body.name,
         type: req.body.type,
         bobot: req.body.bobot,
@@ -54,16 +57,16 @@ module.exports = async (req, res) => {
     });
 
     if (created && created.id) {
-        return res.json(201, {
+        return res.status(201).json({
             status: 'success',
             data: {
                 id: created.id
             }
         });
     } else {
-        return res.json(400, {
+        return res.status(400).json({
             status: 'error',
             message: 'error create'
         });
     }
-}
+};

@@ -1,6 +1,13 @@
-// const getKriteria = require('./getKriteria') 
+const destroy = require('./destroy')
+const getKriteriaByID = require('./getKriteriaByID')
+const getKriterias = require('./getKriterias')
 const store = require('./store') 
+const update = require('./update')
+
 module.exports = {
-    // getKriteria,
+    getKriterias,
+    getKriteriaByID,
     store,
+    update,
+    destroy,
 }

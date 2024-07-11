@@ -40,7 +40,7 @@ const LoginCover = () => {
 
     try {
       const { email, password } = auth;
-      const response = await fetch(`${process.env.API_URL}/auth/login`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

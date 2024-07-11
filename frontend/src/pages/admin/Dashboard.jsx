@@ -30,7 +30,9 @@ const Dashboard = () => {
   const [roleAdmin, setRoleAdmin] = useState(false);
   const [roleUstadz, setRoleUstadz] = useState(false);
   const [roleManagerial, setRoleManagerial] = useState(false);
-  const [roleUser, setRoleUser] = useState(false)
+  const [roleUser, setRoleUser] = useState(false);
+  const [students, setStudents] = useState("");
+  const [kriterias, setKriterias] = useState("");
 
   useEffect(() => {
     // console.log("anda sebagai", role);
@@ -42,8 +44,45 @@ const Dashboard = () => {
     } else if (role === "Managerial") {
       setRoleManagerial(true);
     } else if (role === "User") {
-      setRoleUser(true)
+      setRoleUser(true);
     }
+  }, []);
+
+  //GET STUDENT
+  const fetchStudents = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/students`,
+        {
+          method: "GET",
+        }
+      );
+      const data = await response.json();
+      setStudents(data.data);
+    } catch (error) {
+      setError(error);
+    }
+  };
+
+  // GET Kriteria
+  const fetchKriteria = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/kriteria`,
+        {
+          method: "GET",
+        }
+      );
+      const data = await response.json();
+      setKriterias(data.data);
+    } catch (error) {
+      setError(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudents();
+    fetchKriteria();
   }, []);
 
   return (
@@ -140,7 +179,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <p className="text-[#3b3f5c] text-2xl lg:text-3xl ps-2">
-                      7
+                      {kriterias.length}
                     </p>
                     <p className="text-[#3b3f5c] text-2xl lg:text-3xl">
                       Kriteria
@@ -165,7 +204,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <p className="text-[#3b3f5c] text-2xl lg:text-3xl ps-2">
-                      30
+                      {students.length}
                     </p>
                     <p className="text-[#3b3f5c] text-2xl lg:text-3xl">
                       Santri
@@ -219,19 +258,19 @@ const Dashboard = () => {
 
             {/* card */}
             {roleAdmin || roleManagerial ? (
-            <div className="flex items-center hover:translate-y-[-3px] transition-all">
-              <div
-                className="w-full h-full bg-white shadow-[4px_6px_10px_-3px_#bfc9d4] rounded dark:shadow-none border-b-4 border-success cursor-pointer"
-                onClick={() => [navigate("/admin/data-alternatif")]}
-              >
-                <div className="p-4 py-6">
-                  <div className="flex justify-between items-center ">
-                    <p>Data Alternatif</p>
-                    <LuUsers size={20} />
+              <div className="flex items-center hover:translate-y-[-3px] transition-all">
+                <div
+                  className="w-full h-full bg-white shadow-[4px_6px_10px_-3px_#bfc9d4] rounded dark:shadow-none border-b-4 border-success cursor-pointer"
+                  onClick={() => [navigate("/admin/data-alternatif")]}
+                >
+                  <div className="p-4 py-6">
+                    <div className="flex justify-between items-center ">
+                      <p>Data Alternatif</p>
+                      <LuUsers size={20} />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             ) : null}
 
             {/* card */}
@@ -249,7 +288,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-            ) : null}  
+            ) : null}
 
             {/* card */}
             {roleAdmin || roleUstadz ? (
@@ -282,7 +321,6 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
