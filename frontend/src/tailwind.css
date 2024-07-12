@@ -474,7 +474,7 @@
         @apply border-b !border-white-light/40 ;
     }
     table.table-hover tbody tr {
-        @apply hover:!bg-gray-50 ;
+        @apply hover:!bg-gray-100 ;
     }
     table.table-striped tbody tr:nth-child(odd) {
         @apply !bg-white-light/20;

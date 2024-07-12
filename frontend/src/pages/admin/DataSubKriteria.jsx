@@ -2,12 +2,10 @@ import {
   LuFolder,
   LuLayoutGrid,
   LuFolderTree,
-  LuUser,
   LuUsers,
   LuFileEdit,
   LuCalculator,
   LuFileBarChart,
-  LuUserCog,
   LuTrash2,
   LuPlus,
 } from "react-icons/lu";
@@ -16,91 +14,43 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-
-const tableData = [
-  {
-    id: 1,
-    kode_kriteria: "C1",
-    kriteria: "Absensi",
-    sub_kriteria: [
-      { deskripsi: "Lebih dari 90%", nilai: 3 },
-      { deskripsi: "Lebih dari sama dengan 85%", nilai: 2 },
-      { deskripsi: "Kurang dari 85%", nilai: 1 },
-    ],
-  },
-  {
-    id: 2,
-    kode_kriteria: "C2",
-    kriteria: "Nilai Mapel Dinas",
-    sub_kriteria: [
-      { deskripsi: "Lebih dari 90%", nilai: 3 },
-      { deskripsi: "Lebih dari sama dengan 80%", nilai: 2 },
-      { deskripsi: "Kurang dari 80%", nilai: 1 },
-    ],
-  },
-  {
-    id: 3,
-    kode_kriteria: "C3",
-    kriteria: "Nilai Mapel Pondok",
-    sub_kriteria: [
-      { deskripsi: "Lebih dari 90%", nilai: 3 },
-      { deskripsi: "Lebih dari sama dengan 80%", nilai: 2 },
-      { deskripsi: "Kurang dari 80%", nilai: 1 },
-    ],
-  },
-  {
-    id: 4,
-    kode_kriteria: "C4",
-    kriteria: "Sertifikat Prestasi",
-    sub_kriteria: [
-      { deskripsi: "Memiliki Sertifikat Lebih dari 5", nilai: 3 },
-      { deskripsi: "Memiliki Sertifikat Lebih dari 3", nilai: 2 },
-      { deskripsi: "Kurang dari sama dengan 3", nilai: 1 },
-    ],
-  },
-  {
-    id: 5,
-    kode_kriteria: "C5",
-    kriteria: "Tahfidz",
-    sub_kriteria: [
-      { deskripsi: "Lebih dari sama dengan 15 Juz", nilai: 3 },
-      { deskripsi: "Lebih dari sama dengan 6 Juz", nilai: 2 },
-      { deskripsi: "Kurang dari 6 Juz", nilai: 1 },
-    ],
-  },
-  {
-    id: 6,
-    kode_kriteria: "C6",
-    kriteria: "Bahasa Arab",
-    sub_kriteria: [
-      { deskripsi: "Mencapai Kitab Arab Baron 5-6", nilai: 3 },
-      { deskripsi: "Mencapai Kitab Arab Baron 3-4", nilai: 2 },
-      { deskripsi: "Mencapai Kitab Arab Baron 1-2", nilai: 1 },
-    ],
-  },
-  {
-    id: 7,
-    kode_kriteria: "C7",
-    kriteria: "Bussiness Plan / Produk",
-    sub_kriteria: [
-      { deskripsi: "Lebih dari sama dengan 3 produk", nilai: 3 },
-      { deskripsi: "Memiliki 2 Produk", nilai: 2 },
-      { deskripsi: "Memiliki 1 Produk", nilai: 1 },
-    ],
-  },
-];
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  Dialog,
+  Input,
+  Typography,
+} from "@material-tailwind/react";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 const DataSubKriteria = () => {
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
+
+  const [openAdd, setOpenAdd] = useState(false);
+  const [subKriterias, setSubKriterias] = useState([]);
+  const [kriteriaID, setKriteriaID] = useState("");
+  const [subkriteriaID, setSubKriteriaID] = useState("");
+  const [kriteriaName, setKriteriaName] = useState("");
+  const [kriteriaKode, setKriteriakode] = useState("");
+  const [subKriteriaName, setSubKriteriaName] = useState("");
+  const [curSubKriteriaName, setCurSubKriteriaName] = useState("");
+  const [score, setScore] = useState(0);
+
+  const [scoreError, setScoreError] = useState("");
+  const [subKriteriaError, setSubKriteriaError] = useState("");
+  const [serverError, setServerError] = useState("");
+  const [openUpdate, setOpenUpdate] = useState(false);
+
 
   const [roleAdmin, setRoleAdmin] = useState(false);
   const [roleUstadz, setRoleUstadz] = useState(false);
   const [roleManagerial, setRoleManagerial] = useState(false);
 
   useEffect(() => {
-    // console.log("anda sebagai", role);
-
     if (role === "Admin") {
       setRoleAdmin(true);
     } else if (role === "Ustadz") {
@@ -108,9 +58,300 @@ const DataSubKriteria = () => {
     } else if (role === "Managerial") {
       setRoleManagerial(true);
     }
+  }, [role]);
+
+  const mySwal = withReactContent(Swal);
+
+  // GET ALL Sub Kriteria
+  const fetchSubKriteria = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/sub-kriteria`,
+        {
+          method: "GET",
+        }
+      );
+      const data = await response.json();
+      setSubKriterias(data.data);
+    } catch (error) {
+      console.error("Error fetching sub kriteria:", error);
+    }
+  };
+
+  // CREATE Sub Kritera By Kriteria ID
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setScoreError("");
+    setSubKriteriaError("");
+
+    let isValid = true;
+    if (!subKriteriaName) {
+      setSubKriteriaError("Masukan Keterangan");
+      isValid = false;
+    }
+    if (!score) {
+      setScoreError("Masukan Nilai");
+      isValid = false;
+    }
+    if (!isValid) {
+      return;
+    }
+
+    const name = subKriteriaName;
+    const kriteria_id = kriteriaID;
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/sub-kriteria`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, score, kriteria_id }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setServerError(data.message);
+        return;
+      }
+
+      if (response.ok) {
+        console.log("Sub Kriteria Berhasil Di buat:", data);
+        fetchSubKriteria();
+        setScore("");
+        setSubKriteriaName("");
+        handleOpenAdd();
+        mySwal.fire({
+          title: "Berhasil",
+          text: "Sub Kriteria Berhasil ditambahkan",
+          icon: "success",
+          confirmButtonColor: "#00ab55",
+        });
+      } else {
+        console.error("Error buat Sub Kriteria:", data.message);
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+    }
+  };
+
+  // DELETE Sub Kriteria
+  const handleDelete = (id, name) => {
+    Swal.fire({
+      html: `Apakah yakin akan menghapus <strong>${name}</strong>`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Iya, Hapus",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(
+            `${process.env.REACT_APP_API_URL}/sub-kriteria/${id}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          if (response.ok) {
+            console.log("Sub Kriteria berhasil dihapus");
+            fetchSubKriteria();
+          } else {
+            const data = await response.json();
+            console.error("Error hapus sub Kriteria:", data.message);
+          }
+        } catch (error) {
+          console.error("Network error:", error);
+        }
+        Swal.fire({
+          title: "Dihapus",
+          text: `${name} berhasil dihapus`,
+          icon: "success",
+        });
+      }
+    });
+  };
+
+  // UPDATE Sub Kriteria
+  const handleUpdate = async (id) => {
+    setScoreError("");
+    setSubKriteriaError("");
+
+    let isValid = true;
+    if (!subKriteriaName) {
+      setSubKriteriaError("Masukan Keterangan");
+      isValid = false;
+    }
+    if (!score) {
+      setScoreError("Masukan Nilai");
+      isValid = false;
+    }
+    if (!isValid) {
+      return;
+    }
+
+    const name = subKriteriaName;
+    const kriteria_id = kriteriaID;
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/sub-kriteria/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, score, kriteria_id }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setServerError(data.message);
+        return;
+      }
+
+      if (response.ok) {
+        console.log("Sub Kriteria Berhasil Di Update:", data);
+        fetchSubKriteria();
+        setScore("");
+        setSubKriteriaName("");
+        handleOpenUpdate();
+        mySwal.fire({
+          title: "Berhasil",
+          text: "Sub Kriteria Berhasil diUpdate",
+          icon: "success",
+          confirmButtonColor: "#00ab55",
+        });
+      } else {
+        console.error("Error update Sub Kriteria:", data.message);
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+    }
+
+
+  }
+
+  useEffect(() => {
+    fetchSubKriteria();
   }, []);
+
+  const handleOpenAdd = (name, kode, id) => {
+    console.log("kriteria_id : ", id);
+    setKriteriaName(name);
+    setKriteriakode(kode);
+    setKriteriaID(id);
+    setOpenAdd((cur) => !cur);
+  };
+
+  const handleOpenUpdate = (id, name, score, id_kriteria) => {
+    setKriteriaID(id_kriteria)
+    setSubKriteriaID(id)
+    setCurSubKriteriaName(name)
+    setSubKriteriaName(name)
+    setScore(score)
+    setOpenUpdate((cur) => !cur);
+  };
+
+
+
   return (
     <>
+      <Dialog
+        size="xs"
+        open={openUpdate}
+        handler={handleOpenUpdate}
+        className="bg-transparent shadow-none"
+      >
+        <Card className="mx-auto w-full max-w-[24rem]">
+          <CardBody className="flex flex-col gap-4">
+            <Typography variant="h4" className="text-success">
+              Edit {curSubKriteriaName}
+            </Typography>
+            <Typography className="-mb-2" variant="h6">
+              Keterangan
+            </Typography>
+            <Input
+              label="masukan keterangan"
+              size="lg"
+              type="text"
+              value={subKriteriaName}
+              onChange={(e) => setSubKriteriaName(e.target.value)}
+            />
+            <Typography className="-mb-2" variant="h6">
+              Nilai
+            </Typography>
+            <Input
+              label="masukan score"
+              size="lg"
+              type="number"
+              value={score}
+              onChange={(e) => setScore(Number(e.target.value))}
+            />
+          </CardBody>
+          <CardFooter className="pt-0 flex justify-between gap-6">
+            <Button className="bg-success w-full" onClick={() => handleUpdate(subkriteriaID)}>
+              Tambah
+            </Button>
+            <Button className="bg-gray-400 w-full" onClick={handleOpenUpdate}>
+              Batal
+            </Button>
+          </CardFooter>
+        </Card>
+      </Dialog>
+      <Dialog
+        size="xs"
+        open={openAdd}
+        handler={handleOpenAdd}
+        className="bg-transparent shadow-none"
+      >
+        <Card className="mx-auto w-full max-w-[24rem]">
+          <CardBody className="flex flex-col gap-4">
+            <Typography variant="h4" className="text-success">
+              Tambah sub kriteria
+              <div className="text-base">
+                ({kriteriaName} - C{kriteriaKode})
+              </div>
+            </Typography>
+            <Typography className="-mb-2" variant="h6">
+              Keterangan
+            </Typography>
+            <Input
+              label="masukan keterangan"
+              size="lg"
+              type="text"
+              value={subKriteriaName}
+              onChange={(e) => setSubKriteriaName(e.target.value)}
+            />
+            <Typography className="-mb-2" variant="h6">
+              Nilai
+            </Typography>
+            <Input
+              label="masukan score"
+              size="lg"
+              type="number"
+              value={score}
+              onChange={(e) => setScore(Number(e.target.value))}
+            />
+          </CardBody>
+          <CardFooter className="pt-0 flex justify-between gap-6">
+            <Button className="bg-success w-full" onClick={handleSubmit}>
+              Tambah
+            </Button>
+            <Button className="bg-gray-400 w-full" onClick={handleOpenAdd}>
+              Batal
+            </Button>
+          </CardFooter>
+        </Card>
+      </Dialog>
+
       <div className="flex flex-col">
         <Sidebar>
           <SidebarItem
@@ -162,7 +403,6 @@ const DataSubKriteria = () => {
           />
         </Sidebar>
 
-        {/* Header */}
         <div className="bg-white border-b-[1px] w-full">
           <div className="p-4 ms-[275px]">
             <div className="flex items-center gap-2 text-gray-600 font-semibold dark:text-white-dark">
@@ -173,57 +413,74 @@ const DataSubKriteria = () => {
         </div>
 
         <div className="p-4 pt-2 ms-[275px]">
-          {tableData.map((data) => {
+          {subKriterias.map((data) => {
             return (
-              <div className="w-full flex flex-col mt-3 bg-white shadow-md rounded-md">
+              <div
+                key={data._id}
+                className="w-full flex flex-col mt-3 bg-white shadow-md rounded-md"
+              >
                 <div className="border p-2 rounded-t-md ps-5 text-xl flex items-center justify-between">
                   <span>
-                    {data.kriteria} ({data.kode_kriteria})
+                    {data.name} (C{data.kode})
                   </span>
                   <button
                     type="button"
                     className="btn bg-success border-none text-white items-center gap-2"
+                    onClick={() =>
+                      handleOpenAdd(data.name, data.kode, data._id)
+                    }
                   >
                     <span>Tambah</span>
                     <LuPlus />
                   </button>
                 </div>
                 <div className="p-5 border rounded-b-md">
-                  <div className="table-responsive mb-5">
-                    <table className="table-hover">
-                      <thead>
-                        <tr>
-                          <th>Deskripsi Sub Kriteria</th>
-                          <th>Nilai</th>
-                          <th className="text-center">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {data.sub_kriteria.map((sub, index) => (
-                          <tr key={index}>
-                            <td>
-                              <div className="whitespace-nowrap">
-                                {sub.deskripsi}
-                              </div>
-                            </td>
-                            <td>{sub.nilai}</td>
-                            <td className="text-center space-x-3">
-                              <Tippy content="Edit">
-                                <button type="button">
-                                  <LuFileEdit className="text-success" />
-                                </button>
-                              </Tippy>
-                              <Tippy content="Delete">
-                                <button type="button">
-                                  <LuTrash2 className="text-danger" />
-                                </button>
-                              </Tippy>
-                            </td>
+                  {data.sub_kriteria.length > 0 ? (
+                    <div className="table-responsive mb-5">
+                      <table className="table-hover">
+                        <thead>
+                          <tr>
+                            <th>Deskripsi Sub Kriteria</th>
+                            <th>Nilai</th>
+                            <th className="text-center">Action</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {data.sub_kriteria.map((sub) => (
+                            <tr key={sub._id}>
+                              <td>
+                                <div className="whitespace-nowrap">
+                                  {sub.name}
+                                </div>
+                              </td>
+                              <td>{sub.score}</td>
+                              <td className="text-center space-x-3">
+                                <Tippy content="Edit">
+                                  <button type="button" onClick={() => handleOpenUpdate(sub._id, sub.name, sub.score, data._id)}>
+                                    <LuFileEdit className="text-success" />
+                                  </button>
+                                </Tippy>
+                                <Tippy content="Delete">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleDelete(sub._id, sub.name)
+                                    }
+                                  >
+                                    <LuTrash2 className="text-danger" />
+                                  </button>
+                                </Tippy>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-500">
+                      Tidak ada sub kriteria
+                    </div>
+                  )}
                 </div>
               </div>
             );

@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
             name: req.body.name,
         }).then(() => {
             return res.status(200).json({
-                status: 'error',
+                status: 'success',
                 message: 'Santri berhasil diupdate'
             });
         }).catch(({message}) => {

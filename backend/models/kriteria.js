@@ -6,29 +6,30 @@ const Fields = new Schema(
   {
     kode: {
       type: Number,
-      required: true
+      required: true,
     },
     name: {
       type: String,
-      required: true
+      required: true,
     },
     bobot: {
       type: Number,
-      required: true
+      required: true,
     },
     normalizedBobot: {
       type: Number,
-      required: true
+      required: true,
     },
     type: {
       type: String,
       enum: ["cost", "benefit"],
-      required: true
+      required: true,
     },
+    sub_kriteria: [{ type: Schema.Types.ObjectId, ref: "SubKriteria" }],
   },
   { timestamps: true }
-)
+);
 
-const Model = mongoose.model('Kriteria', Fields)
+const Model = mongoose.model("Kriteria", Fields);
 
-module.exports = Model
+module.exports = Model;

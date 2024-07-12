@@ -446,35 +446,47 @@ const DataAlternatif = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {students.map((data, index) => (
-                      <tr key={data._id}>
-                        <td>{index + 1}</td>
-                        <td>{data.nisn}</td>
-                        <td>{data.name}</td>
-                        <td className="text-center space-x-3">
-                          <Tippy content="Edit">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleOpenUpdate(data._id, data.nisn, data.name)
-                              }
-                            >
-                              <LuFileEdit className="text-success" />
-                            </button>
-                          </Tippy>
-                          <Tippy content="Delete">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                handleDelete(data._id, data.name);
-                              }}
-                            >
-                              <LuTrash2 className="text-danger" />
-                            </button>
-                          </Tippy>
+                    {students.length > 0 ? (
+                      students.map((data, index) => (
+                        <tr key={data._id}>
+                          <td>A{index + 1}</td>
+                          <td>{data.nisn}</td>
+                          <td>{data.name}</td>
+                          <td className="text-center space-x-3">
+                            <Tippy content="Edit">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleOpenUpdate(
+                                    data._id,
+                                    data.nisn,
+                                    data.name
+                                  )
+                                }
+                              >
+                                <LuFileEdit className="text-success" />
+                              </button>
+                            </Tippy>
+                            <Tippy content="Delete">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleDelete(data._id, data.name);
+                                }}
+                              >
+                                <LuTrash2 className="text-danger" />
+                              </button>
+                            </Tippy>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="text-center">
+                          Data santri tidak ada
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
                 {error && (
