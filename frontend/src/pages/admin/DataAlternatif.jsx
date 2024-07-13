@@ -449,8 +449,8 @@ const DataAlternatif = () => {
                     {students.length > 0 ? (
                       students.map((data, index) => (
                         <tr key={data._id}>
-                          <td>A{index + 1}</td>
-                          <td>{data.nisn}</td>
+                          <td className="text-center">A{index + 1}</td>
+                          <td className="text-center">{data.nisn}</td>
                           <td>{data.name}</td>
                           <td className="text-center space-x-3">
                             <Tippy content="Edit">

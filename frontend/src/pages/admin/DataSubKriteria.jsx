@@ -72,11 +72,14 @@ const DataSubKriteria = () => {
         }
       );
       const data = await response.json();
+      console.log(data);
       setSubKriterias(data.data);
     } catch (error) {
       console.error("Error fetching sub kriteria:", error);
     }
   };
+
+  console.log(subKriterias);
 
   // CREATE Sub Kritera By Kriteria ID
   const handleSubmit = async (e) => {
@@ -298,7 +301,7 @@ const DataSubKriteria = () => {
           </CardBody>
           <CardFooter className="pt-0 flex justify-between gap-6">
             <Button className="bg-success w-full" onClick={() => handleUpdate(subkriteriaID)}>
-              Tambah
+              Edit
             </Button>
             <Button className="bg-gray-400 w-full" onClick={handleOpenUpdate}>
               Batal
