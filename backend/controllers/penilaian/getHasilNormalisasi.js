@@ -40,7 +40,7 @@ module.exports = async (req, res) => {
         // Temukan penilaian untuk setiap kriteria
         const kriteriaId = Object.keys(kriteriaMap).find(id => kriteriaMap[id] === kriteriaKode);
         const penilaian = studentPenilaian.find(p => p.kriteria_id.toString() === kriteriaId);
-        acc[kriteriaKode] = penilaian ? penilaian.student_score : 0;
+        acc[kriteriaKode] = penilaian ? parseFloat(penilaian.normalization_score.toFixed(3)) : 0;
         return acc;
       }, {});
 

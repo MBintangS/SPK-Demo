@@ -16,138 +16,11 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { IconButton, Typography } from "@material-tailwind/react";
 
-const DataTabelStandarisasi = [
-  { Alternatif: "A1", C1: 1, C2: 2, C3: 3, C4: 1, C5: 2, C6: 3, C7: 1 },
-  { Alternatif: "A2", C1: 2, C2: 1, C3: 2, C4: 3, C5: 1, C6: 2, C7: 3 },
-  { Alternatif: "A3", C1: 3, C2: 3, C3: 1, C4: 2, C5: 3, C6: 1, C7: 2 },
-  { Alternatif: "A4", C1: 1, C2: 3, C3: 2, C4: 1, C5: 3, C6: 2, C7: 1 },
-  { Alternatif: "A5", C1: 2, C2: 2, C3: 3, C4: 3, C5: 1, C6: 1, C7: 3 },
-  { Alternatif: "A6", C1: 3, C2: 1, C3: 1, C4: 2, C5: 2, C6: 3, C7: 1 },
-  { Alternatif: "A7", C1: 1, C2: 3, C3: 3, C4: 1, C5: 2, C6: 1, C7: 2 },
-  { Alternatif: "A8", C1: 2, C2: 2, C3: 2, C4: 3, C5: 3, C6: 2, C7: 3 },
-  { Alternatif: "A9", C1: 3, C2: 1, C3: 1, C4: 2, C5: 1, C6: 3, C7: 1 },
-  { Alternatif: "A10", C1: 1, C2: 3, C3: 2, C4: 3, C5: 2, C6: 1, C7: 2 },
-];
-
-const DataTabelNormalisasi = [
-  {
-    Alternatif: "A1",
-    C1: 0.333,
-    C2: 0.667,
-    C3: 1,
-    C4: 0.333,
-    C5: 0.667,
-    C6: 1,
-    C7: 0.333,
-  },
-  {
-    Alternatif: "A2",
-    C1: 0.667,
-    C2: 0.333,
-    C3: 0.667,
-    C4: 1,
-    C5: 0.333,
-    C6: 0.667,
-    C7: 1,
-  },
-  {
-    Alternatif: "A3",
-    C1: 1,
-    C2: 1,
-    C3: 0.333,
-    C4: 0.667,
-    C5: 1,
-    C6: 0.333,
-    C7: 0.667,
-  },
-  {
-    Alternatif: "A4",
-    C1: 0.333,
-    C2: 1,
-    C3: 0.667,
-    C4: 0.333,
-    C5: 1,
-    C6: 0.667,
-    C7: 0.333,
-  },
-  {
-    Alternatif: "A5",
-    C1: 0.667,
-    C2: 0.667,
-    C3: 1,
-    C4: 1,
-    C5: 0.333,
-    C6: 0.333,
-    C7: 1,
-  },
-  {
-    Alternatif: "A6",
-    C1: 1,
-    C2: 0.333,
-    C3: 0.333,
-    C4: 0.667,
-    C5: 0.667,
-    C6: 1,
-    C7: 0.333,
-  },
-  {
-    Alternatif: "A7",
-    C1: 0.333,
-    C2: 1,
-    C3: 1,
-    C4: 0.333,
-    C5: 0.667,
-    C6: 0.333,
-    C7: 0.667,
-  },
-  {
-    Alternatif: "A8",
-    C1: 0.667,
-    C2: 0.667,
-    C3: 0.667,
-    C4: 1,
-    C5: 1,
-    C6: 0.667,
-    C7: 1,
-  },
-  {
-    Alternatif: "A9",
-    C1: 1,
-    C2: 0.333,
-    C3: 0.333,
-    C4: 0.667,
-    C5: 0.333,
-    C6: 1,
-    C7: 0.333,
-  },
-  {
-    Alternatif: "A10",
-    C1: 0.333,
-    C2: 1,
-    C3: 0.667,
-    C4: 1,
-    C5: 0.667,
-    C6: 0.333,
-    C7: 0.667,
-  },
-];
 
 const bobotTabel = [
   { C1: 0.2, C2: 0.15, C3: 0.15, C4: 0.1, C5: 0.15, C6: 0.15, C7: 0.1 },
 ];
 
-const hasilQi = [
-  { no: 1, alternatif: "A1", nilaiQi: "0.539" },
-  { no: 2, alternatif: "A2", nilaiQi: "0.515" },
-  { no: 3, alternatif: "A3", nilaiQi: "0.547" },
-  { no: 4, alternatif: "A4", nilaiQi: "0.496" },
-  { no: 5, alternatif: "A5", nilaiQi: "0.537" },
-  { no: 6, alternatif: "A6", nilaiQi: "0.522" },
-  { no: 7, alternatif: "A7", nilaiQi: "0.494" },
-  { no: 8, alternatif: "A8", nilaiQi: "0.547" },
-  { no: 9, alternatif: "A9", nilaiQi: "0.520" },
-  { no: 10, alternatif: "A10", nilaiQi: "0.528" },
-];
 
 const DataPerhitungan = () => {
   const navigate = useNavigate();
@@ -157,9 +30,79 @@ const DataPerhitungan = () => {
   const [roleUstadz, setRoleUstadz] = useState(false);
   const [roleManagerial, setRoleManagerial] = useState(false);
 
-  useEffect(() => {
-    // console.log("anda sebagai", role);
+  const [hasilPenilaian, setHasilPenilaian] = useState([]);
+  const [hasilNormalisasi, setHasilNormalisasi] = useState([]);
+  const [hasilPreferensiQi, setHasilPreferensiQi] = useState([]);
+  const [error, setError] = useState("");
 
+  //GET HASIL PENILAIAN / STANDARISASI
+  const fetchHasilPenilaian = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/penilaian/hasil`,
+        {
+          method: "GET",
+        }
+      );
+      const data = await response.json();
+      setHasilPenilaian(data.data);
+    } catch (error) {
+      setError(error);
+    }
+  };
+
+  //GET HASIL NORMALISASI
+  const fetchHasilNormalisasi = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/penilaian/hasil-normalisasi`,
+        {
+          method: "GET",
+        }
+      );
+      const data = await response.json();
+      setHasilNormalisasi(data.data);
+    } catch (error) {
+      setError(error);
+    }
+  };
+
+  //GET HASIL PREFERENSI Qi
+  const fethHasilPreferensiQi = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/penilaian/hasil-preferensi-qi`,
+        {
+          method: "GET",
+        }
+      );
+      const data = await response.json();
+      setHasilPreferensiQi(data.data);
+    } catch (error) {
+      setError(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchHasilPenilaian();
+    fetchHasilNormalisasi();
+    fethHasilPreferensiQi();
+  }, []);
+
+  // console.log(hasilPenilaian);
+  // console.log(hasilNormalisasi);
+  console.log(hasilPreferensiQi);
+
+  const { columns: columnsPenilaian, rows: rowsPenilaian } = hasilPenilaian;
+  const { columns: columnsNormalisasi, rows: rowsNormalisasi } =
+    hasilNormalisasi;
+  const { columns: columnsPreferensiQi, rows: rowsPreferensiQi } =
+    hasilPreferensiQi;
+
+  // console.log("rows :", rowsPenilaian);
+  // console.log("cols :", columnsPenilaian);
+
+  useEffect(() => {
     if (role === "Admin") {
       setRoleAdmin(true);
     } else if (role === "Ustadz") {
@@ -178,39 +121,44 @@ const DataPerhitungan = () => {
   const indexOfLastItemStandarisasi = currentPageStandarisasi * itemsPerPage;
   const indexOfFirstItemStandarisasi =
     indexOfLastItemStandarisasi - itemsPerPage;
-  const currentItemsStandarisasi = DataTabelStandarisasi.slice(
+
+  const curRowsPenilaian = rowsPenilaian?.slice(
     indexOfFirstItemStandarisasi,
     indexOfLastItemStandarisasi
   );
 
   // Calculate total pages for standarisasi table
   const totalPagesStandarisasi = Math.ceil(
-    DataTabelStandarisasi.length / itemsPerPage
+    rowsPenilaian?.length / itemsPerPage
   );
 
   // Calculate current items for normalisasi table
   const indexOfLastItemNormalisasi = currentPageNormalisasi * itemsPerPage;
   const indexOfFirstItemNormalisasi = indexOfLastItemNormalisasi - itemsPerPage;
-  const currentItemsNormalisasi = DataTabelNormalisasi.slice(
+
+  const curRowsNormalisasi = rowsNormalisasi?.slice(
     indexOfFirstItemNormalisasi,
     indexOfLastItemNormalisasi
   );
 
   // Calculate total pages for normalisasi table
   const totalPagesNormalisasi = Math.ceil(
-    DataTabelNormalisasi.length / itemsPerPage
+    rowsNormalisasi?.length / itemsPerPage
   );
 
   // Calculate current items for hasil perhitungan table
   const indexOfLastItemPerhitungan = currentPagePerhitungan * itemsPerPage;
   const indexOfFirstItemPerhitungan = indexOfLastItemPerhitungan - itemsPerPage;
-  const currentItemsPerhitungan = hasilQi.slice(
+
+  const curRowsPreferensiQi = rowsPreferensiQi?.slice(
     indexOfFirstItemPerhitungan,
     indexOfLastItemPerhitungan
   );
 
   // Calculate total pages for hasil perhitungan table
-  const totalPagesPerhitungan = Math.ceil(hasilQi.length / itemsPerPage);
+  const totalPagesPerhitungan = Math.ceil(
+    rowsPreferensiQi?.length / itemsPerPage
+  );
 
   // Handlers for page change
   const nextStandarisasi = () => {
@@ -312,29 +260,44 @@ const DataPerhitungan = () => {
             <div>Tabel Standarisasi</div>
             <div className="table-responsive mb-5 mt-5">
               <table className="table-hover">
-                <thead>
-                  <tr>
-                    <th>Alternatif</th>
-                    <th>C1</th>
-                    <th>C2</th>
-                    <th>C3</th>
-                    <th>C4</th>
-                    <th>C5</th>
-                    <th>C6</th>
-                    <th>C7</th>
-                  </tr>
-                </thead>
+                <tr>
+                  {columnsPenilaian?.map((column, index) => (
+                    <th
+                      key={column}
+                      className={`border-b border-blue-gray-100 bg-success p-4 ${
+                        index === 0 ? "rounded-tl-lg" : ""
+                      } ${
+                        index === columnsPenilaian.length - 1
+                          ? "rounded-tr-lg"
+                          : ""
+                      }`}
+                    >
+                      <Typography
+                        variant="h6"
+                        className="text-white font-medium leading-none"
+                      >
+                        {column}
+                      </Typography>
+                    </th>
+                  ))}
+                </tr>
                 <tbody>
-                  {currentItemsStandarisasi.map((row, index) => (
-                    <tr key={index} className="text-center">
-                      <td>{row.Alternatif}</td>
-                      <td>{row.C1}</td>
-                      <td>{row.C2}</td>
-                      <td>{row.C3}</td>
-                      <td>{row.C4}</td>
-                      <td>{row.C5}</td>
-                      <td>{row.C6}</td>
-                      <td>{row.C7}</td>
+                  {curRowsPenilaian?.map((row, index) => (
+                    <tr
+                      key={index}
+                      className="even:bg-blue-gray-50/50 text-center"
+                    >
+                      {columnsPenilaian.map((column) => (
+                        <td key={column}>
+                          <Typography
+                            variant="paragraph"
+                            color="blue-gray"
+                            className="font-normal text-center"
+                          >
+                            {row[column]}
+                          </Typography>
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
@@ -377,27 +340,44 @@ const DataPerhitungan = () => {
               <table className="table-hover">
                 <thead>
                   <tr>
-                    <th>Alternatif</th>
-                    <th>C1</th>
-                    <th>C2</th>
-                    <th>C3</th>
-                    <th>C4</th>
-                    <th>C5</th>
-                    <th>C6</th>
-                    <th>C7</th>
+                    {columnsNormalisasi?.map((column, index) => (
+                      <th
+                        key={column}
+                        className={`border-b border-blue-gray-100 bg-success p-4 ${
+                          index === 0 ? "rounded-tl-lg" : ""
+                        } ${
+                          index === columnsNormalisasi.length - 1
+                            ? "rounded-tr-lg"
+                            : ""
+                        }`}
+                      >
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          {column}
+                        </Typography>
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItemsNormalisasi.map((row, index) => (
-                    <tr key={index} className="text-center">
-                      <td>{row.Alternatif}</td>
-                      <td>{row.C1}</td>
-                      <td>{row.C2}</td>
-                      <td>{row.C3}</td>
-                      <td>{row.C4}</td>
-                      <td>{row.C5}</td>
-                      <td>{row.C6}</td>
-                      <td>{row.C7}</td>
+                  {curRowsNormalisasi?.map((row, index) => (
+                    <tr
+                      key={index}
+                      className="even:bg-blue-gray-50/50 text-center"
+                    >
+                      {columnsNormalisasi.map((column) => (
+                        <td key={column}>
+                          <Typography
+                            variant="paragraph"
+                            color="blue-gray"
+                            className="font-normal text-center"
+                          >
+                            {row[column]}
+                          </Typography>
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
@@ -470,20 +450,47 @@ const DataPerhitungan = () => {
           <div className="bg-white rounded-md w-full p-3 border mt-4">
             <div>Hasil Perhitungan</div>
             <div className="table-responsive max-w-[500px] mb-5 mt-5">
-              <table className="table-hover">
+              <table className="table-hover w-full">
                 <thead>
                   <tr>
-                    <th>No</th>
-                    <th>Alternatif</th>
-                    <th>Nilai Qi</th>
+                    {columnsPreferensiQi?.map((column, index) => (
+                      <th
+                        key={column}
+                        className={`border-b border-blue-gray-100 bg-success p-4 ${
+                          index === 0 ? "rounded-tl-lg" : ""
+                        } ${
+                          index === columnsPreferensiQi.length - 1
+                            ? "rounded-tr-lg"
+                            : ""
+                        }`}
+                      >
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          {column}
+                        </Typography>
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItemsPerhitungan.map((row) => (
-                    <tr key={row.no} className="text-center">
-                      <td>{row.no}</td>
-                      <td>{row.alternatif}</td>
-                      <td>{row.nilaiQi}</td>
+                  {curRowsPreferensiQi?.map((row, rowIndex) => (
+                    <tr
+                      key={rowIndex}
+                      className="even:bg-blue-gray-50/50 text-center"
+                    >
+                      {columnsPreferensiQi.map((column, colIndex) => (
+                        <td key={colIndex} className="p-4">
+                          <Typography
+                            variant="paragraph"
+                            color="blue-gray"
+                            className="font-normal text-center"
+                          >
+                            {row[column]}
+                          </Typography>
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>

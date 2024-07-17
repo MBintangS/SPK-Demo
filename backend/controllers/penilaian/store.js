@@ -1,4 +1,4 @@
-const { Penilaian, SubKriteria } = require("../../models");
+const { Penilaian, SubKriteria, Kriteria } = require("../../models");
 const fastestValidator = require("fastest-validator");
 const validator = new fastestValidator();
 
@@ -20,33 +20,41 @@ module.exports = async (req, res) => {
     const results = await Promise.all(
       req.body.kriteria.map(async (data) => {
         try {
+
           const highScore = await SubKriteria.findOne({
             kriteria_id: data.kriteria_id,
-          })
-            .sort({ score: -1 })
-            .then((item) => item.score)
-            .catch(() => {
-              throw new Error("score tidak ditemukan");
-            });
+          }).sort({ score: -1 });
 
-          const normalization_score = await SubKriteria.findById(
-            data.sub_kriteria_id
-          )
-            .select("name score kriteria_id")
-            .then((item) => item.score / highScore)
-            .catch(() => {
-              throw new Error("Sub Kriteria tidak ditemukan");
-            });
+          if (!highScore) throw new Error("High score tidak ditemukan");
 
-          console.log(normalization_score);
+          const lowScore = await SubKriteria.findOne({
+            kriteria_id: data.kriteria_id,
+          }).sort({ score: 1 });
+
+          if (!lowScore) throw new Error("Low score tidak ditemukan");
+
+          const studentScore = await SubKriteria.findById(data.sub_kriteria_id).select("score");
+
+          if (!studentScore) throw new Error("Student score tidak ditemukan");
+
+          const kriteriaType = await Kriteria.findById(data.kriteria_id).select("type");
+
+          if (!kriteriaType) throw new Error("Kriteria type tidak ditemukan");
+
+          let normalizationScore;
+
+          if (kriteriaType.type === "benefit") {
+            normalizationScore = studentScore.score / highScore.score;
+          } else {
+            normalizationScore = lowScore.score / studentScore.score;
+          }
 
           const created = await Penilaian.create({
             student_id: req.body.student_id,
             kriteria_id: data.kriteria_id,
             sub_kriteria_id: data.sub_kriteria_id,
-            normalization_score: normalization_score,
-          }).catch(() => {
-            throw new Error("error create penilaian");
+            normalization_score: normalizationScore,
+            student_score: studentScore.score,
           });
 
           return {
@@ -64,17 +72,19 @@ module.exports = async (req, res) => {
       })
     );
 
-    const errors = results.filter(result => result.status === "error");
+    const errors = results.filter((result) => result.status === "error");
     if (errors.length > 0) {
       return res.status(400).json({
         status: "error",
-        message: errors.map(error => error.message),
+        message: errors.map((error) => error.message),
       });
     }
 
     return res.status(201).json({
       status: "success",
-      data: results.filter(result => result.status === "success").map(result => result.data),
+      data: results
+        .filter((result) => result.status === "success")
+        .map((result) => result.data),
     });
   } catch (error) {
     return res.status(500).json({

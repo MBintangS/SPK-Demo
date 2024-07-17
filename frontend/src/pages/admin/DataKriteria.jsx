@@ -472,63 +472,147 @@ const DataKriteria = () => {
             <LuPlus />
           </button>
 
-          {/* Tabel */}
+          {/* TABEL Kriteria */}
           <div className="w-full flex flex-col mt-3 bg-white shadow-md rounded-md">
-            {/* <div className="border p-2 rounded-t-md ps-5 text-xl">
-              <span>Tabel Kriteria</span>
-            </div> */}
             <div className="p-5 border rounded-md">
               <div className="table-responsive mb-5">
                 <table className="table-hover">
                   <thead>
                     <tr>
-                      <th>Kode</th>
-                      <th>Kriteria</th>
-                      <th>Bobot</th>
-                      <th>Type</th>
-                      <th>Normalisasi Bobot</th>
-                      <th className="text-center">Action</th>
+                      <th className="border-b border-blue-gray-100 bg-success p-4 rounded-tl-lg">
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          Kode
+                        </Typography>
+                      </th>
+                      <th className="border-b border-blue-gray-100 bg-success p-4">
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          Kriteria
+                        </Typography>
+                      </th>
+                      <th className="border-b border-blue-gray-100 bg-success p-4">
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          Bobot
+                        </Typography>
+                      </th>
+                      <th className="border-b border-blue-gray-100 bg-success p-4">
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          Type
+                        </Typography>
+                      </th>
+                      <th className="border-b border-blue-gray-100 bg-success p-4">
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          Normalisasi Bobot
+                        </Typography>
+                      </th>
+                      <th className="border-b border-blue-gray-100 bg-success p-4 rounded-tr-lg">
+                        <Typography
+                          variant="6"
+                          className="text-white font-medium leading-none"
+                        >
+                          Action
+                        </Typography>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {kriterias.map((data) => {
                       return (
-                        <tr key={data._id}>
-                          <td>
-                            <div className="whitespace-nowrap">
+                        <tr key={data._id} className="even:bg-blue-gray-50/50">
+                          <td className="p-4">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal text-center"
+                            >
                               C{data.kode}
-                            </div>
+                            </Typography>
                           </td>
-                          <td className="text-center">{data.name}</td>
-                          <td className="text-center">{data.bobot}</td>
-                          <td className="text-center">{data.type}</td>
                           <td className="text-center">
-                            {data.normalizedBobot.toFixed(2)}
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal"
+                            >
+                              {data.name}
+                            </Typography>
+                          </td>
+                          <td className="text-center">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal"
+                            >
+                              {data.bobot}
+                            </Typography>
+                          </td>
+                          <td className="text-center">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal"
+                            >
+                              {data.type}
+                            </Typography>
+                          </td>
+                          <td className="text-center">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal"
+                            >
+                              {data.normalizedBobot.toFixed(2)}
+                            </Typography>
                           </td>
                           <td className="text-center space-x-3">
-                            <Tippy content="Edit">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleOpenUpdate(
-                                    data._id,
-                                    data.name,
-                                    data.bobot,
-                                    data.type
-                                  )
-                                }
-                              >
-                                <LuFileEdit className="text-success" />
-                              </button>
-                            </Tippy>
-                            <Tippy content="Delete">
-                              <button
-                                type="button"
-                                onClick={() => handleDelete(data._id, data.name)}
-                              >
-                                <LuTrash2 className="text-danger" />
-                              </button>
-                            </Tippy>
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal"
+                            >
+                              <Tippy content="Edit">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleOpenUpdate(
+                                      data._id,
+                                      data.name,
+                                      data.bobot,
+                                      data.type
+                                    )
+                                  }
+                                >
+                                  <LuFileEdit
+                                    className="text-success"
+                                    size={20}
+                                  />
+                                </button>
+                              </Tippy>
+                              <Tippy content="Delete">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleDelete(data._id, data.name)
+                                  }
+                                >
+                                  <LuTrash2 className="text-danger" size={20} />
+                                </button>
+                              </Tippy>
+                            </Typography>
                           </td>
                         </tr>
                       );

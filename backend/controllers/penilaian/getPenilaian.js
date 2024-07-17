@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
   }
 };
 
-// // --------------------------------------------------------
+// --------------------------------------------------------
 // const { Penilaian, Kriteria, Student } = require('../../models');
 
 // module.exports = async (req, res) => {

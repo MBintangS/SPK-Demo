@@ -34,6 +34,7 @@ const DataPenilaian = () => {
   const [penilaian, setPenilaian] = useState([]);
   const [subKriterias, setSubKriterias] = useState([]);
   const [dataPenilaianStudent, setDataPenilaianStudent] = useState([]);
+  const [penilaianStudent, setPenilaianStudent] = useState([]);
   const [studentId, setStudentId] = useState("");
   const [currName, setCurrName] = useState("");
   const [errors, setErrors] = useState({});
@@ -45,12 +46,11 @@ const DataPenilaian = () => {
   const [roleManagerial, setRoleManagerial] = useState(false);
 
   const [openAdd, setOpenAdd] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
 
   const mySwal = withReactContent(Swal);
 
   useEffect(() => {
-    // console.log("anda sebagai", role);
-
     if (role === "Admin") {
       setRoleAdmin(true);
     } else if (role === "Ustadz") {
@@ -76,9 +76,7 @@ const DataPenilaian = () => {
     }
   };
 
-  console.log(subKriterias);
-
-  //GET STUDENT
+  //GET PENILAIAN
   const fetchPenilaian = async () => {
     try {
       const response = await fetch(
@@ -87,10 +85,60 @@ const DataPenilaian = () => {
           method: "GET",
         }
       );
-      const data = await response.json();
-      setPenilaian(data.data);
+      const { data } = await response.json();
+      setPenilaian(data);
     } catch (error) {
       setError(error);
+    }
+  };
+
+  // CREATE PENILAIAN
+  const handleSubmit = async () => {
+    if (validateForm()) {
+      const student_id = studentId;
+      const requestBody = {
+        student_id,
+        kriteria: dataPenilaianStudent,
+      };
+      console.log(requestBody);
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/penilaian`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.message);
+          return;
+        }
+
+        if (response.ok) {
+          console.log("Penilaian Berhasil Di buat:", data);
+          fetchPenilaian();
+          handleOpenAdd();
+          setDataPenilaianStudent([]);
+          setErrors({});
+          setStudentId("");
+          mySwal.fire({
+            title: "Berhasil",
+            text: "Penilaian Berhasil ditambahkan",
+            icon: "success",
+            confirmButtonColor: "#00ab55",
+          });
+        } else {
+          console.error("Error buat penilaian:", data.message);
+        }
+      } catch (error) {
+        console.error("Network error:", error);
+      }
     }
   };
 
@@ -130,8 +178,7 @@ const DataPenilaian = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Tambah Penilaian
-  const handleSubmit = async () => {
+  const handleUpdate = async (id) => {
     if (validateForm()) {
       const student_id = studentId;
       const requestBody = {
@@ -142,30 +189,33 @@ const DataPenilaian = () => {
 
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/penilaian`,
+          `${process.env.REACT_APP_API_URL}/penilaian/:${id}`,
           {
-            method: "POST",
+            method: "PUT",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(requestBody),
           }
         );
-  
+
         const data = await response.json();
-  
+
         if (!response.ok) {
           setError(data.message);
           return;
         }
-  
+
         if (response.ok) {
           console.log("Penilaian Berhasil Di buat:", data);
           fetchPenilaian();
-          handleOpenAdd();
+          handleOpenUpdate();
+          setDataPenilaianStudent([]);
+          setErrors({});
+          setStudentId("");
           mySwal.fire({
             title: "Berhasil",
-            text: "Penilaian Berhasil ditambahkan",
+            text: "Penilaian Berhasil diUpdate",
             icon: "success",
             confirmButtonColor: "#00ab55",
           });
@@ -175,31 +225,50 @@ const DataPenilaian = () => {
       } catch (error) {
         console.error("Network error:", error);
       }
-
-
     }
   };
 
   // console.log(penilaian);
   // console.log(subKriterias);
-  console.log(dataPenilaianStudent);
+  // console.log(dataPenilaianStudent);
 
   useEffect(() => {
     fetchSubKriteria();
     fetchPenilaian();
+    // fetchPenilaianByStudentID()
   }, []);
 
   const handleOpenAdd = (id, name) => {
-    setCurrName(name)
+    setCurrName(name);
     setDataPenilaianStudent([]);
-    setErrors({})
+    setErrors({});
     setStudentId(id);
     setOpenAdd((cur) => !cur);
   };
 
-  const handleOpenUpdate = () => {
-    console.log("UPDATE OPEN");
-  }
+  const getSelectedValue = (kriteria_id) => {
+    if (dataPenilaianStudent.length > 0) {
+      const currentVal = dataPenilaianStudent.filter(
+        (e) => e.kriteria_id == kriteria_id && e
+      );
+      if (currentVal.length > 0) {
+        return currentVal[0].sub_kriteria_id;
+      }
+    }
+  };
+
+  const handleOpenUpdate = (id, name, penilaian) => {
+    setOpenUpdate((cur) => !cur);
+    if (id && penilaian) {
+      setPenilaianStudent(penilaian);
+      setStudentId(id);
+      setCurrName(name);
+      setDataPenilaianStudent([]);
+      penilaian.map(({ sub_kriteria_id, kriteria_id }) => {
+        handleSelectChange(kriteria_id, sub_kriteria_id);
+      });
+    }
+  };
 
   return (
     <>
@@ -211,7 +280,7 @@ const DataPenilaian = () => {
         <Card className="mx-auto w-full max-h-screen overflow-auto">
           <CardBody className="max-h-screen">
             <Typography variant="h4" className="text-gray-700 mb-5">
-              Tambah Penilaian <span className="text-success">{currName}</span> 
+              Tambah Penilaian <span className="text-success">{currName}</span>
             </Typography>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {subKriterias.map((data) => (
@@ -244,6 +313,56 @@ const DataPenilaian = () => {
               Tambah
             </Button>
             <Button className="bg-gray-400 w-full" onClick={handleOpenAdd}>
+              Batal
+            </Button>
+          </CardFooter>
+        </Card>
+      </Dialog>
+      <Dialog
+        open={openUpdate}
+        handler={handleOpenUpdate}
+        className="bg-transparent shadow-none"
+      >
+        <Card className="mx-auto w-full max-h-screen overflow-auto">
+          <CardBody className="max-h-screen">
+            <Typography variant="h4" className="text-gray-700 mb-5">
+              Edit Penilaian <span className="text-success">{currName}</span>
+            </Typography>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {subKriterias.map((data, index) => (
+                <div key={data._id}>
+                  <Typography variant="h6" className="mb-2">
+                    {data.name} (C{data.kode})
+                  </Typography>
+                  <Select
+                    color="green"
+                    label={`Pilih ${data.name}`}
+                    onChange={(e) => handleSelectChange(data._id, e)}
+                    value={getSelectedValue(data._id)}
+                  >
+                    {data.sub_kriteria.map((sub) => (
+                      <Option key={sub._id} value={sub._id}>
+                        {sub.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  {errors[data._id] && (
+                    <Typography variant="small" className="text-red-500">
+                      {errors[data._id]}
+                    </Typography>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardBody>
+          <CardFooter className="pt-0 flex justify-between gap-6">
+            <Button
+              className="bg-success w-full"
+              onClick={() => handleUpdate(studentId)}
+            >
+              Edit
+            </Button>
+            <Button className="bg-gray-400 w-full" onClick={handleOpenUpdate}>
               Batal
             </Button>
           </CardFooter>
@@ -322,46 +441,111 @@ const DataPenilaian = () => {
                 <table className="table-hover">
                   <thead>
                     <tr>
-                      <th>No</th>
-                      <th>NISN</th>
-                      <th>Nama Santri</th>
-                      <th className="text-center">Action</th>
+                      <th className="border-b border-blue-gray-100 bg-success p-4 rounded-tl-lg">
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          No
+                        </Typography>
+                      </th>
+                      <th className="border-b border-blue-gray-100 bg-success p-4">
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          NISN
+                        </Typography>
+                      </th>
+                      <th className="border-b border-blue-gray-100 bg-success p-4">
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          Nama Santri
+                        </Typography>
+                      </th>
+                      <th className="text-center border-b border-blue-gray-100 bg-success p-4 rounded-tr-lg">
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          Action
+                        </Typography>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {penilaian.map((data, index) => {
                       return (
-                        <tr key={data._id}>
+                        <tr key={data._id} className="even:bg-blue-gray-50/50">
                           <td>
-                            <div className="whitespace-nowrap">
+                            <Typography
+                              variant="paragraph"
+                              color="blue-gray"
+                              className="font-normal text-center"
+                            >
                               A{index + 1}
-                            </div>
+                            </Typography>
                           </td>
-                          <td>{data.nisn}</td>
-                          <td>{data.name}</td>
+                          <td>
+                            <Typography
+                              variant="paragraph"
+                              color="blue-gray"
+                              className="font-normal text-center"
+                            >
+                              {data.nisn}
+                            </Typography>
+                          </td>
+                          <td>
+                            <Typography
+                              variant="paragraph"
+                              color="blue-gray"
+                              className="font-normal"
+                            >
+                              {data.name}
+                            </Typography>
+                          </td>
                           <td className="text-center space-x-3">
-                            {data.penilaian.length > 0 ? (
-                              <Tippy content="Edit Nilai">
-                                <button type="button" onClick={() => handleOpenUpdate()}>
-                                  <LuFileEdit
-                                    className="text-warning"
-                                    size={24}
-                                  />
-                                </button>
-                              </Tippy>
-                            ) : (
-                              <Tippy content="Tambah Nilai">
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenAdd(data._id, data.name)}
-                                >
-                                  <LuPlusSquare
-                                    className="text-success"
-                                    size={24}
-                                  />
-                                </button>
-                              </Tippy>
-                            )}
+                            <Typography
+                              variant="paragraph"
+                              color="blue-gray"
+                              className="font-normal text-center"
+                            >
+                              {data.penilaian.length > 0 ? (
+                                <Tippy content="Edit Nilai">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleOpenUpdate(
+                                        data._id,
+                                        data.name,
+                                        data.penilaian
+                                      )
+                                    }
+                                  >
+                                    <LuFileEdit
+                                      className="text-warning"
+                                      size={20}
+                                    />
+                                  </button>
+                                </Tippy>
+                              ) : (
+                                <Tippy content="Tambah Nilai">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleOpenAdd(data._id, data.name)
+                                    }
+                                  >
+                                    <LuPlusSquare
+                                      className="text-success"
+                                      size={20}
+                                    />
+                                  </button>
+                                </Tippy>
+                              )}
+                            </Typography>
                           </td>
                         </tr>
                       );

@@ -45,7 +45,6 @@ const DataSubKriteria = () => {
   const [serverError, setServerError] = useState("");
   const [openUpdate, setOpenUpdate] = useState(false);
 
-
   const [roleAdmin, setRoleAdmin] = useState(false);
   const [roleUstadz, setRoleUstadz] = useState(false);
   const [roleManagerial, setRoleManagerial] = useState(false);
@@ -238,9 +237,7 @@ const DataSubKriteria = () => {
     } catch (error) {
       console.error("Network error:", error);
     }
-
-
-  }
+  };
 
   useEffect(() => {
     fetchSubKriteria();
@@ -255,15 +252,13 @@ const DataSubKriteria = () => {
   };
 
   const handleOpenUpdate = (id, name, score, id_kriteria) => {
-    setKriteriaID(id_kriteria)
-    setSubKriteriaID(id)
-    setCurSubKriteriaName(name)
-    setSubKriteriaName(name)
-    setScore(score)
+    setKriteriaID(id_kriteria);
+    setSubKriteriaID(id);
+    setCurSubKriteriaName(name);
+    setSubKriteriaName(name);
+    setScore(score);
     setOpenUpdate((cur) => !cur);
   };
-
-
 
   return (
     <>
@@ -300,7 +295,10 @@ const DataSubKriteria = () => {
             />
           </CardBody>
           <CardFooter className="pt-0 flex justify-between gap-6">
-            <Button className="bg-success w-full" onClick={() => handleUpdate(subkriteriaID)}>
+            <Button
+              className="bg-success w-full"
+              onClick={() => handleUpdate(subkriteriaID)}
+            >
               Edit
             </Button>
             <Button className="bg-gray-400 w-full" onClick={handleOpenUpdate}>
@@ -443,36 +441,95 @@ const DataSubKriteria = () => {
                       <table className="table-hover">
                         <thead>
                           <tr>
-                            <th>Deskripsi Sub Kriteria</th>
-                            <th>Nilai</th>
-                            <th className="text-center">Action</th>
+                            <th className="border-b border-blue-gray-100 bg-success p-4 rounded-tl-lg">
+                              <Typography
+                                variant="h6"
+                                className="text-white font-medium leading-none"
+                              >
+                                Deskripsi Sub Kriteria
+                              </Typography>
+                            </th>
+                            <th className="border-b border-blue-gray-100 bg-success p-4">
+                              <Typography
+                                variant="h6"
+                                className="text-white font-medium leading-none"
+                              >
+                                Nilai
+                              </Typography>
+                            </th>
+                            <th className="text-center border-b border-blue-gray-100 bg-success p-4 rounded-tr-lg">
+                              <Typography
+                                variant="h6"
+                                className="text-white font-medium leading-none"
+                              >
+                                Action
+                              </Typography>
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           {data.sub_kriteria.map((sub) => (
-                            <tr key={sub._id}>
-                              <td>
-                                <div className="whitespace-nowrap">
+                            <tr
+                              key={sub._id}
+                              className="even:bg-blue-gray-50/50"
+                            >
+                              <td className="p-4">
+                                <Typography
+                                  variant="paragraph"
+                                  color="blue-gray"
+                                  className="font-normal text-center"
+                                >
                                   {sub.name}
-                                </div>
+                                </Typography>
                               </td>
-                              <td>{sub.score}</td>
+                              <td>
+                                {" "}
+                                <Typography
+                                  variant="paragraph"
+                                  color="blue-gray"
+                                  className="font-normal text-center"
+                                >
+                                  {sub.score}
+                                </Typography>
+                              </td>
                               <td className="text-center space-x-3">
-                                <Tippy content="Edit">
-                                  <button type="button" onClick={() => handleOpenUpdate(sub._id, sub.name, sub.score, data._id)}>
-                                    <LuFileEdit className="text-success" />
-                                  </button>
-                                </Tippy>
-                                <Tippy content="Delete">
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleDelete(sub._id, sub.name)
-                                    }
-                                  >
-                                    <LuTrash2 className="text-danger" />
-                                  </button>
-                                </Tippy>
+                                <Typography
+                                  variant="paragraph"
+                                  color="blue-gray"
+                                  className="font-normal text-center"
+                                >
+                                  <Tippy content="Edit">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleOpenUpdate(
+                                          sub._id,
+                                          sub.name,
+                                          sub.score,
+                                          data._id
+                                        )
+                                      }
+                                    >
+                                      <LuFileEdit
+                                        className="text-success"
+                                        size={20}
+                                      />
+                                    </button>
+                                  </Tippy>
+                                  <Tippy content="Delete">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleDelete(sub._id, sub.name)
+                                      }
+                                    >
+                                      <LuTrash2
+                                        className="text-danger"
+                                        size={20}
+                                      />
+                                    </button>
+                                  </Tippy>
+                                </Typography>
                               </td>
                             </tr>
                           ))}

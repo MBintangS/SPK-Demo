@@ -4,17 +4,8 @@ module.exports = async (req, res) => {
   try {
     // Ambil semua data penilaian, kriteria, dan mahasiswa
     const penilaianData = await Penilaian.find({}).sort({ createdAt: 1 });
-    const kriteriaData = await Kriteria.find({}).select('kode _id');
+    const kriteriaData = await Kriteria.find({}).select('_id kode normalizedBobot');
     const studentData = await Student.find({});
-
-    // Buat Map untuk kriteria_id ke kriteria.name
-    const kriteriaMap = kriteriaData.reduce((acc, kriteria) => {
-      acc[kriteria._id.toString()] = `C${kriteria.kode}`;
-      return acc;
-    }, {});
-
-    // Ambil nama-nama kriteria sebagai header kolom
-    const kriteriaKodes = kriteriaData.map(kriteria => `C${kriteria.kode}`);
 
     // Kelompokkan penilaian berdasarkan student_id
     const groupedPenilaian = penilaianData.reduce((acc, item) => {
@@ -35,30 +26,35 @@ module.exports = async (req, res) => {
 
     // Format data mahasiswa untuk tabel matriks
     const tableData = studentData.map((student, index) => {
-      const studentPenilaian = groupedPenilaian[student._id.toString()] || [];
-      const result = kriteriaKodes.reduce((acc, kriteriaKode) => {
-        // Temukan penilaian untuk setiap kriteria
-        const kriteriaId = Object.keys(kriteriaMap).find(id => kriteriaMap[id] === kriteriaKode);
-        const penilaian = studentPenilaian.find(p => p.kriteria_id.toString() === kriteriaId);
-        acc[kriteriaKode] = penilaian ? penilaian.student_score : 0;
-        return acc;
-      }, {});
+      const studentPenilaian = groupedPenilaian[student.id] || [];
+      let x = 0;
+      let y = 0;
+      let qi = 0;
+      if (studentPenilaian.length) {  
+        studentPenilaian.map((nilai, index) => {
+          const kriteria = kriteriaData.find(kriteria => kriteria.id === nilai.kriteria_id.toString());
+          x += parseFloat(parseFloat(nilai.normalization_score) * parseFloat(kriteria.normalizedBobot)); 
+          if (y == 0) {
+            y = parseFloat(Math.pow(parseFloat(nilai.normalization_score), parseFloat(kriteria.normalizedBobot))); 
+          } else {
+            y *= parseFloat(Math.pow(parseFloat(nilai.normalization_score), parseFloat(kriteria.normalizedBobot))); 
+          }
+        })
+        qi = parseFloat((( 0.5 * x ) + ( 0.5 * y )).toFixed(3))
+      }
 
       return {
         index: getIndexLabel(index), // Menggunakan format A1, A2, dst.
-        ...result
+        qi
       };
     });
 
-    // Format JSON untuk frontend
+    // Format JSON untuk frontend 
     const responseData = {
-      columns: ['Alternatif', ...kriteriaKodes],
+      columns: ['Alternatif', "Nilai Preferensi Qi"],
       rows: tableData.map(row => ({
         Alternatif: row.index,
-        ...kriteriaKodes.reduce((acc, kriteriaKode) => {
-          acc[kriteriaKode] = row[kriteriaKode];
-          return acc;
-        }, {})
+        "Nilai Preferensi Qi": row.qi
       }))
     };
 

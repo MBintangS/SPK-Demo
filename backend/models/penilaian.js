@@ -22,6 +22,10 @@ const Fields = new Schema(
       type: Number,
       required: true,
     },
+    student_score: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );
