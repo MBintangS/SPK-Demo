@@ -8,10 +8,15 @@ import {
   LuCalculator,
   LuFileBarChart,
   LuUserCog,
+  LuDownload,
 } from "react-icons/lu";
 import Sidebar, { SidebarItem } from "../../components/Sidebar";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Typography } from "@material-tailwind/react";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import xlsx from "json-as-xlsx"
 
 const DataHasilAkhir = () => {
   const navigate = useNavigate();
@@ -21,6 +26,10 @@ const DataHasilAkhir = () => {
   const [roleAdmin, setRoleAdmin] = useState(false);
   const [roleUstadz, setRoleUstadz] = useState(false);
   const [roleManagerial, setRoleManagerial] = useState(false);
+
+  const [hasilPreferensiQi, setHasilPreferensiQi] = useState([]);
+  const [hasilAkhirDownload, setHasilAkhirDownload] = useState([]);
+
 
   useEffect(() => {
     // console.log("anda sebagai", role);
@@ -33,6 +42,55 @@ const DataHasilAkhir = () => {
       setRoleManagerial(true);
     }
   }, []);
+
+    //GET HASIL PREFERENSI Qi
+    const fethHasilPreferensiQi = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/penilaian/hasil-akhir`,
+          {
+            method: "GET",
+          }
+        );
+        const data = await response.json();
+        setHasilPreferensiQi(data.data);
+      } catch (error) {
+        setError(error);
+      }
+    };
+
+    const fetchHasilDownload = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/penilaian/hasil-akhir-download`,
+          {
+            method: "GET",
+          }
+        );
+        const data = await response.json();
+        setHasilAkhirDownload(data.data);
+      } catch (error) {
+        setError(error);
+      }
+    }
+
+    useEffect(() => {
+      fethHasilPreferensiQi()
+      fetchHasilDownload()
+    },[])
+
+  const { columns: columnsPreferensiQi, rows: rowsPreferensiQi } =
+  hasilPreferensiQi;
+
+  const handleDownload = () => {
+    if (hasilAkhirDownload) {
+      let settings = {
+        fileName: "HASIL-SPK-SANTRI"
+      }
+      xlsx([hasilAkhirDownload], settings)
+    }
+  }
+
   return (
     <>
       <div className="flex flex-col">
@@ -96,7 +154,71 @@ const DataHasilAkhir = () => {
           </div>
         </div>
 
-        <div className="p-4 pt-5 ms-[275px]">HALAMAN DATA HASIL AKHIR</div>
+        <div className="p-4 pt-5 ms-[275px]">
+          {/* Tabel Hasil Perhitungan */}
+          <div className="bg-white rounded-md w-full p-3 border mt-4">
+            <div>Hasil Perhitungan</div>
+            <div className="p-2 rounded-t-md justify-end flex pr-5 ps-5 text-xl">
+            <Tippy content="Download to XLXs">
+              <button
+                type="button"
+                className="btn bg-success border-none text-white items-center gap-2"
+                onClick={handleDownload}
+              >
+                Download
+                <LuDownload />
+              </button>
+            </Tippy>
+          </div>
+            <div className="table-responsive mb-5 mt-5">
+              <table className="table-hover w-full">
+                <thead>
+                  <tr>
+                    {columnsPreferensiQi?.map((column, index) => (
+                      <th
+                        key={column}
+                        className={`border-b border-blue-gray-100 bg-success p-4 ${
+                          index === 0 ? "rounded-tl-lg" : ""
+                        } ${
+                          index === columnsPreferensiQi.length - 1
+                            ? "rounded-tr-lg"
+                            : ""
+                        }`}
+                      >
+                        <Typography
+                          variant="h6"
+                          className="text-white font-medium leading-none"
+                        >
+                          {column}
+                        </Typography>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rowsPreferensiQi?.map((row, rowIndex) => (
+                    <tr
+                      key={rowIndex}
+                      className="even:bg-blue-gray-50/50"
+                    >
+                      {columnsPreferensiQi.map((column, colIndex) => (
+                        <td key={colIndex} className="p-4">
+                          <Typography
+                            variant="paragraph"
+                            color="blue-gray"
+                            className="font-normal text-center"
+                          >
+                            {row[column]}
+                          </Typography>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

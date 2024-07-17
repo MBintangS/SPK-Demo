@@ -7,6 +7,7 @@ import {
   LuCalculator,
   LuFileBarChart,
   LuPlusSquare,
+  LuRefreshCcw,
 } from "react-icons/lu";
 import Sidebar, { SidebarItem } from "../../components/Sidebar";
 import { useNavigate } from "react-router-dom";
@@ -235,7 +236,6 @@ const DataPenilaian = () => {
   useEffect(() => {
     fetchSubKriteria();
     fetchPenilaian();
-    // fetchPenilaianByStudentID()
   }, []);
 
   const handleOpenAdd = (id, name) => {
@@ -268,6 +268,50 @@ const DataPenilaian = () => {
         handleSelectChange(kriteria_id, sub_kriteria_id);
       });
     }
+  };
+
+  const handleDelete = () => {
+    Swal.fire({
+      title: "Semua penilaian akan di hapus",
+      html: `Apakah yakin akan reset semua penilaian`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#808080",
+      confirmButtonText: "Iya, Reset Semua",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(
+            `${process.env.REACT_APP_API_URL}/penilaian`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          if (response.ok) {
+            console.log("penilaian berhasil di reset");
+            Swal.fire({
+              title: "Dihapus",
+              text: `penilaian berhasil di reset`,
+              icon: "success",
+            });
+            fetchPenilaian();
+          } else {
+            const data = await response.json();
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: `${data.message}`,
+              // footer: '<a href="#">Why do I have this issue?</a>'
+            });
+            console.error("Error reset penilaian:", data.message);
+          }
+        } catch (error) {
+          console.error("Network error:", error);
+        }
+      }
+    });
   };
 
   return (
@@ -432,10 +476,18 @@ const DataPenilaian = () => {
 
         <div className="p-4 pt ms-[275px]">
           {/* Tabel */}
-          <div className="w-full flex flex-col  bg-white shadow-md rounded-md">
-            {/* <div className="border p-2 rounded-t-md ps-5 text-xl">
-              <span>Tabel Kriteria</span>
-            </div> */}
+          <div className="p-2 rounded-t-md justify-end flex pr-5 ps-5 text-xl">
+            <Tippy content="Reset Penilaian">
+              <button
+                type="button"
+                className="btn bg-danger border-none text-white items-center gap-2"
+                onClick={handleDelete}
+              >
+                <LuRefreshCcw className="ms-2 me-2" />
+              </button>
+            </Tippy>
+          </div>
+          <div className="w-full flex flex-col bg-white shadow-md rounded-md">
             <div className="p-5 border rounded-md">
               <div className="table-responsive mb-5">
                 <table className="table-hover">
